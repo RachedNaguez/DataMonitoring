@@ -1,0 +1,7 @@
+﻿namespace DataMonitoring.SubscribeTableDependencies
+{
+    public interface ISubscribeTableDependency
+    {
+        void SubscribeTableDependency(string connectionString);
+    }
+}

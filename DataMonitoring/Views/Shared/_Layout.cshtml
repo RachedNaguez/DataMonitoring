@@ -1,0 +1,208 @@
+﻿@using DataMonitoring.Contants
+@using Microsoft.AspNetCore.Identity
+@inject IAuthorizationService AuthorizationService
+
+@using DataMonitoring.Contants
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Responsive Admin &amp; Dashboard Template based on Bootstrap 5">
+	<meta name="author" content="AdminKit">
+	<meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link rel="shortcut icon" href="~/assets/img/icons/icon-48x48.png" />
+
+	<link rel="canonical" href="https://demo-basic.adminkit.io/" />
+
+	<title>DataMonitoring</title>
+
+	<link href="~/assets/css/app.css" rel="stylesheet">
+	<link rel="stylesheet" href="~/icons-1.9.0/font/bootstrap-icons.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<!---->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+	 
+	<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" ></script>-->
+</head>
+
+<body>
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" asp-controller="Dashboard" asp-action="Index">
+          <span class="align-middle">DataMonitoring</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item ">
+						<a class="sidebar-link" asp-controller="Dashboard" asp-action="Index">
+              <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
+            </a>
+					</li>
+					@if (SignInManager.IsSignedIn(User))
+					{
+						<li class="sidebar-item">
+							<a class="sidebar-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+							<i class="align-middle" data-feather="user"></i> <span class="align-middle">Profile</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+									<button  type="submit" class="btn btn-link sidebar-link">
+									<i class="align-middle me-1" data-feather="log-out"></i> <span class="align-middle">Logout</span>
+									</button>
+							</form>
+						</li>
+					}
+					@if (User.IsInRole(Roles.SuperAdmin.ToString()))
+                        {
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" asp-controller="Users" asp-action="Index"><i class="align-middle" data-feather="users"></i> <span class="align-middle">Manage Users</span></a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" asp-controller="Roles" asp-action="Index"><i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Manage Roles</a>
+                            </li>
+					}
+					@if (AuthorizationService.AuthorizeAsync(User, Permissions.Customers.View).Result.Succeeded) {
+					<li class="sidebar-header">
+						Customers
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" asp-controller="Customers" asp-action="Index">
+              <i class="align-middle" data-feather="user"></i> <span class="align-middle">Customer</span>
+            </a>
+					</li>
+					}
+
+					@if (AuthorizationService.AuthorizeAsync(User, Permissions.Products.View).Result.Succeeded) {
+					<li class="sidebar-header">
+						Products
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" asp-controller="Products" asp-action="Index">
+              <i class="align-middle" data-feather="inbox"></i> <span class="align-middle">Product</span>
+            </a>
+					</li>
+					}
+
+					
+				</ul>
+			</div>
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+          <i class="hamburger align-self-center"></i>
+        </a>
+
+				<div class="navbar-collapse collapse">
+					<ul class="navbar-nav navbar-align">
+						
+						@if (SignInManager.IsSignedIn(User)){
+						<li class="nav-item dropdown">
+							<a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
+                <i class="align-middle" data-feather="settings"></i>
+              </a>
+			  
+				<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+					@if (UserManager.GetUserAsync(User).Result.ProfilePicture != null)
+						{
+							<img src="data:image/*;base64,@(Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture))" class="avatar img-fluid rounded me-1"  /> <span class="text-dark">@UserManager.GetUserName(User)</span>
+						}
+				 </a>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
+								
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="align-middle me-1" data-feather="settings"></i> Settings</a>
+								
+								<div class="dropdown-divider"></div>
+								<form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+									<button  type="submit" class="dropdown-item"><i class="align-middle me-1" data-feather="log-out"></i> <span class="align-middle">Logout</button>
+								</form>
+								
+							</div>
+							</li>
+									}else
+							{
+								<li class="nav-item">
+									<a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+								</li>
+							}
+							</ul>
+				</div>
+			</nav>
+
+			<main class="content">
+				<div class="container-fluid p-0">
+					@RenderBody()
+					
+
+				</div>
+			</main>
+
+			<footer class="footer">
+				<div class="container-fluid">
+					<div class="row text-muted">
+						<div class="col-6 text-start">
+							<p class="mb-0">
+								<a class="text-muted" href="#" target="_blank"><strong>DataMonitoring</strong></a> &copy;
+							</p>
+						</div>
+						<div class="col-6 text-end">
+							<ul class="list-inline">
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</div>
+
+	<script src="~/assets/js/app.js"></script>
+	<!---->
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+	<!---->
+	<script src="https://smtpjs.com/v3/smtp.js"></script>
+	
+	
+	
+	
+
+</body>
+
+</html>
+    @await RenderSectionAsync("Scripts", required: false)
+
